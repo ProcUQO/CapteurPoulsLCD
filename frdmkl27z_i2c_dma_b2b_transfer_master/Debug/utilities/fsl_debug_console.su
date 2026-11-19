@@ -1,0 +1,14 @@
+../utilities/fsl_debug_console.c:113:10:DbgConsole_Init	40	static
+../utilities/fsl_debug_console.c:148:10:DbgConsole_Deinit	8	static
+../utilities/fsl_debug_console.c:165:5:DbgConsole_Printf	16	static
+../utilities/fsl_debug_console.c:183:5:DbgConsole_Putchar	16	static
+../utilities/fsl_debug_console.c:196:5:DbgConsole_Scanf	40	static
+../utilities/fsl_debug_console.c:255:5:DbgConsole_Getchar	16	static
+../utilities/fsl_debug_console.c:279:17:DbgConsole_ScanIgnoreWhiteSpace	24	static
+../utilities/fsl_debug_console.c:303:13:DbgConsole_PrintfPaddingCharacter	32	static
+../utilities/fsl_debug_console.c:326:16:DbgConsole_ConvertRadixNumToString	56	static
+../utilities/fsl_debug_console.c:442:16:DbgConsole_ConvertFloatRadixNumToString	112	static
+../utilities/fsl_debug_console.c:552:12:DbgConsole_PrintfFormattedData	136	static
+../utilities/fsl_debug_console.c:1105:12:DbgConsole_ScanfFormattedData	72	static
+C:/nxp/MCUXpressoIDE_25.6.136/ide/plugins/com.nxp.mcuxpresso.tools.win32_25.6.0.202501151204/tools/redlib/include/sys/libconfig-arm.h:247:5:__sys_write	24	static
+C:/nxp/MCUXpressoIDE_25.6.136/ide/plugins/com.nxp.mcuxpresso.tools.win32_25.6.0.202501151204/tools/redlib/include/sys/libconfig-arm.h:241:5:__sys_readc	16	static

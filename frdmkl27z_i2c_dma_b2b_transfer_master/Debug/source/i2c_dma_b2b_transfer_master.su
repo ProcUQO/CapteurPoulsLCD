@@ -1,0 +1,6 @@
+../source/i2c_dma_b2b_transfer_master.c:54:17:max_write	48	static
+../source/i2c_dma_b2b_transfer_master.c:67:17:max_read	56	static
+../source/i2c_dma_b2b_transfer_master.c:82:13:max_init	16	static
+../source/i2c_dma_b2b_transfer_master.c:108:12:max_read_sample	32	static
+../source/i2c_dma_b2b_transfer_master.c:134:12:bpm_update	40	static
+../source/i2c_dma_b2b_transfer_master.c:187:5:main	48	static
