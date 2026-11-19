@@ -4,17 +4,26 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../source/i2c_dma_b2b_transfer_master.c \
+../source/main.c \
+../source/MAX10302.c \
+../source/TC2004_LCD.c \
+../source/bpm_to_lcd.c \
 ../source/mtb.c \
 ../source/semihost_hardfault.c 
 
 C_DEPS += \
-./source/i2c_dma_b2b_transfer_master.d \
+./source/main.d \
+./source/MAX10302.d \
+./source/TC2004_LCD.d \
+./source/bpm_to_lcd.d \
 ./source/mtb.d \
 ./source/semihost_hardfault.d 
 
 OBJS += \
-./source/i2c_dma_b2b_transfer_master.o \
+./source/main.o \
+./source/MAX10302.o \
+./source/TC2004_LCD.o \
+./source/bpm_to_lcd.o \
 ./source/mtb.o \
 ./source/semihost_hardfault.o 
 
@@ -31,7 +40,6 @@ source/%.o: ../source/%.c source/subdir.mk
 clean: clean-source
 
 clean-source:
-	-$(RM) ./source/i2c_dma_b2b_transfer_master.d ./source/i2c_dma_b2b_transfer_master.o ./source/mtb.d ./source/mtb.o ./source/semihost_hardfault.d ./source/semihost_hardfault.o
+	-$(RM) ./source/main.d ./source/main.o ./source/MAX10302.d ./source/MAX10302.o ./source/TC2004_LCD.d ./source/TC2004_LCD.o ./source/bpm_to_lcd.d ./source/bpm_to_lcd.o ./source/mtb.d ./source/mtb.o ./source/semihost_hardfault.d ./source/semihost_hardfault.o
 
 .PHONY: clean-source
-

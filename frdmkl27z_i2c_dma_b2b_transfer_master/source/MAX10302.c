@@ -3,6 +3,7 @@
 #include "clock_config.h"
 #include "fsl_i2c.h"
 #include "fsl_debug_console.h"
+#include "MAX10302.h"
 #include <string.h>
 
 #define MAX_I2C I2C1
@@ -32,7 +33,7 @@
 
 // les defines pour le traitement du bpm
 #define FS_HZ 100 // 100 échantilons par seconde
-#define FINGER_MIN 15000 // IR sous ce seuil = pas de doigt (pour ne pas spammer)
+#define FINGER_MIN MAX30102_FINGER_MIN // IR sous ce seuil = pas de doigt (pour ne pas spammer)
 #define STABILIZATION 200 // environ 2s pour les premières secondes qu'on pose un doigt
 // (sinon les valeurs ne sont pas rapport pendant qu'on le pose).
 #define SEUIL_BATTEMENT 30
@@ -79,15 +80,16 @@ static status_t max_read(uint8_t registre, uint8_t *paquet, size_t taille)
 /* Configuration des registres.
 
 */
-static void max_init(void)
+void max_init(void)
 {
     uint8_t m;
     // juste un petit reset avant de démarrer (selon la doc (p10, p18), le bit 6 (0x40) est le reset)
     max_write(REG_MODE_CONFIG, 0x40);
     do
     {
+        // Reset
         max_read(REG_MODE_CONFIG, &m, 1);
-    } while (m & 0x40); // ptit bitwise check pour savoir quand c'est au bit 6
+    } while (m & 0x40); // ptit bitwise check pour savoir quand c'est au bit 6 (p.18)
 
     // comme reommandé par la doc (p14), je met tout ça à zéro
     max_write(REG_FIFO_WR_PTR, 0);
@@ -105,7 +107,7 @@ static void max_init(void)
 }
 
 // regarde si le max30102 a de nouvelles mesures, on les prend et on sépare les valeurs rouge/infrarouge
-static int max_read_sample(uint32_t *rouge, uint32_t *infrarouge)
+int max_read_sample(uint32_t *rouge, uint32_t *infrarouge)
 {
     uint8_t write_pointer;
     uint8_t read_pointer;
@@ -131,7 +133,7 @@ static int max_read_sample(uint32_t *rouge, uint32_t *infrarouge)
 
 /* une fois par échantillon. Retourne le BPM lissé quand un
    nouveau battement est détecté, sinon 0. */
-static int bpm_update(uint32_t ir_raw)
+int bpm_update(uint32_t ir_raw)
 {
     int32_t ir = (int32_t)ir_raw;
 
@@ -168,13 +170,14 @@ static int bpm_update(uint32_t ir_raw)
     uint32_t intervalle = bsuivi.nb_echantillons - avant;
     if(avant != 0 && intervalle < INTERVALLE_MIN){
         return 0;
-    } // trop rapproché, on eut assumer que c'est du bruit
+    } // trop rapproché, on peut assumer que c'est du bruit
     bsuivi.dernier_battement = bsuivi.nb_echantillons;
     if(avant == 0 || intervalle > INTERVALLE_MAX){
         return 0;
     } // premier battement (ou trop lent)
 
     // la moyenne de bpm est full simple, c'est le 3/4 de l'ancienne valeur + 1/4 de la nouvelle
+    // moyenne mobile exponentielle (EMA)
     int32_t bpm_instant = (FS_HZ * 60) / intervalle;
     if(bsuivi.bpm == 0){
         bsuivi.bpm = bpm_instant;
@@ -182,34 +185,4 @@ static int bpm_update(uint32_t ir_raw)
         bsuivi.bpm = (bsuivi.bpm * 3 + bpm_instant) / 4;
     }
     return bsuivi.bpm;
-}
-
-int main(void)
-{
-    BOARD_InitPins();
-    BOARD_InitBootClocks();
-    BOARD_InitDebugConsole();
-    PRINTF("Poser le doigt et appuyer sur le bouton!");
-
-    i2c_master_config_t cfg;
-    I2C_MasterGetDefaultConfig(&cfg); // 100 kHz
-    I2C_MasterInit(MAX_I2C, &cfg, CLOCK_GetBusClkFreq());
-
-    uint8_t id = 0;
-    status_t s = max_read(0xFF, &id, 1);
-    PRINTF("status=%d  part ID=0x%02X (attendu 0x15)\r\n", s, id);
-
-    max_init();
-    uint32_t red, ir;
-
-    while (1)
-    {
-        if (max_read_sample(&red, &ir))
-        {
-            int bpm = bpm_update(ir);
-            if (bpm > 0)
-                PRINTF("BPM=%d\r\n", bpm);
-
-        }
-    }
 }
